@@ -20,7 +20,7 @@
 //  [ 6, 2, 5, 9, 4, 8, 1, 3, 7 ],
 //  [ 8, 7, 3, 5, 1, 2, 9, 6, 4 ]
 //  ]) ➞ true
-bool sudokuValidator(List<List> board) {
+bool sudokuValidator(List<List<int>> board) {
   return isSudokuBoardOfRightSize(board) &&
       doCellsContainValidNumber(board) &&
       checkRowCol(board) &&
@@ -29,56 +29,32 @@ bool sudokuValidator(List<List> board) {
 
 //lets check if the board is valid or not first
 // that is, size of the board should be multiple of 3
-bool isSudokuBoardOfRightSize(List<List> board) {
-  for (List row in board) {
-    if (row.length % 3 != 0 && board.length % 3 != 0) {
-      return false;
-    }
-  }
-  print('right size');
-  return true;
-}
+bool isSudokuBoardOfRightSize(List<List<int>> board) =>
+    board.every((row) => row.length % 3 == 0) && (board.length % 3 == 0);
 
 //now lets check if the sudokuBoard contains valid numbers as per its size
-bool doCellsContainValidNumber(List<List> board) {
-  int length =
-      board.length; //length of board or number of rows in board and their size
-  //so all numbers should be form 0 to length
-  for (int row = 0; row < length; row++) {
-    for (int col = 0; col < length; col++) {
-      if (board[row][col] > length ||
-          board[row][col] < 0 ||
-          board[row][col] == 0) {
-        return false;
-      }
-    }
-  }
-  print('valid numbers');
-  return true;
-}
+bool doCellsContainValidNumber(List<List<int>> board) => board
+    .expand((row) => row)
+    .every((number) => number > 0 && number <= board.length);
 
 //now lets check each row and also each column for duplicates
-bool checkRowCol(List<List> board) {
+bool checkRowCol(List<List<int>> board) {
   int length = board.length;
   //checking rows first
-  for (int row = 0; row < length; row++) {
-    if (board[row].toSet().length != length) {
-      return false;
-    }
+  if (board.any((List<int> row) => containsDuplicateElements(row))) {
+    return false;
   }
-  //checking columns
   for (int col = 0; col < length; col++) {
-    List colElementsList = [];
-    for (int row = 0; row < length; row++) {
-      colElementsList.add(board[row][col]);
-    }
-    if (colElementsList.toSet().length != length) {
+    List colElementsList = board.map((List row) => row[col]).toList();
+    if (containsDuplicateElements(colElementsList)) {
       return false;
     }
   }
   print('row & col uniqe');
   return true;
 }
+
+bool containsDuplicateElements(List list) => list.toSet().length != list.length;
 
 //now lets check if all the subBoards of size 3
 //don't have any repeating numbers
@@ -96,6 +72,15 @@ bool checkBoxes(List<List> board) {
 }
 
 bool isBoardBoxValid(List<List> board, int rowPos, int colPos) {
+
+  //another way to write same function in one line
+//  bool isBoardBoxValid(List<List<int>> board, int rowPos, int colPos) =>
+//      !containsDuplicateElements(board
+//          .sublist(rowPos, rowPos + 3)
+//          .map((List<int> row) => row.sublist(colPos, colPos + 3))
+//          .expand((List<int> minRow) => minRow)
+//          .toList());
+
   List elements = [];
 
   for (int row = rowPos; row < rowPos + 3; row++) {
@@ -103,7 +88,6 @@ bool isBoardBoxValid(List<List> board, int rowPos, int colPos) {
       elements.add(board[row][col]);
     }
   }
-//  print(elements); // debug print statement
   if (elements.toSet().length != board.length) {
     return false;
   }
@@ -135,7 +119,7 @@ int countFactors(int number) {
 
 main() {
 //  print(countElementInList([1, 5, 2, 4, 1, 9, 3, 7, 6], 1));
-  List<List> board = [
+  List<List<int>> board = [
     [
       1,
       5,
@@ -144,5 +128,9 @@ main() {
     [7, 3, 9],
     [4, 6, 8],
   ];
-  print(sudokuValidator(board));
+//  List col = [];
+//  board.forEach((row) => col.add(row[0]));
+//  print(col);
+  List expandRowToCol = board.expand((List row) => [row[0]]).toList();
+  print(expandRowToCol);
 }
