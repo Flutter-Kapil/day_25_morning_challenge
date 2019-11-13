@@ -72,7 +72,6 @@ bool checkBoxes(List<List> board) {
 }
 
 bool isBoardBoxValid(List<List> board, int rowPos, int colPos) {
-
   //another way to write same function in one line
 //  bool isBoardBoxValid(List<List<int>> board, int rowPos, int colPos) =>
 //      !containsDuplicateElements(board
